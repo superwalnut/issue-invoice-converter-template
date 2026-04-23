@@ -1,0 +1,11 @@
+**Client:** Persona 1
+**Email:** person@sample.com
+**Phone:** +61 400 000 000
+**Items:**
+- Table tennis coaching session x2 = $100.00
+- Video analysis = $50.00
+- Match statistics report = $30.00
+**Discount:** 0
+**GST:** true
+**Notes:** Please note this is a note
+**Payment Method:** Bank Transfer

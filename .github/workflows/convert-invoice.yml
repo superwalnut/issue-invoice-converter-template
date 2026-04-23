@@ -1,0 +1,37 @@
+# .github/workflows/invoice.yml
+name: Send Invoice
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  send-invoice:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install Chrome dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y chromium-browser
+      - run: npm install
+      - run: node scripts/send-invoice.js
+        env:
+          # The following environment variables are passed to the send-invoice.js script, sourced from the GitHub event and secrets.
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          GITHUB_REPOSITORY: ${{ github.repository }} # e.g. "owner/repo"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # provided by GitHub Actions to authenticate API requests
+          # configure your Mailgun API key and domain in the repository secrets to enable email sending
+          MAILGUN_API_KEY: ${{ secrets.MAILGUN_API_KEY }}
+          MAILGUN_DOMAIN: ${{ secrets.MAILGUN_DOMAIN }}
+          # configure your company details in the repository variables to populate the invoice header and email signature
+          COMPANY_NAME: ${{ vars.COMPANY_NAME }}
+          COMPANY_WEBSITE: ${{ vars.COMPANY_WEBSITE }}
+          COMPANY_ABN: ${{ vars.COMPANY_ABN }}
+          COMPANY_LOCATION: ${{ vars.COMPANY_LOCATION }}
+          COMPANY_SUPPORT_EMAIL: ${{ vars.COMPANY_SUPPORT_EMAIL }}
+          COMPANY_BANK_DETAILS: ${{ vars.COMPANY_BANK_DETAILS }}
