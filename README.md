@@ -34,3 +34,9 @@ COMPANY_SUPPORT_EMAIL=support@samplecompany.com
 COMPANY_BANK_DETAILS=Bank: ABC, Acc Name: Sample Company Pty Ltd, Acc BSB: 123456, Acc Number: 12345678
 ISSUE_BODY_FILE=./test-issue-body.txt
 ```
+
+## Run
+
+```
+node ./composites/scripts/send-invoice.js
+```

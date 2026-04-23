@@ -1,0 +1,112 @@
+# action.yml
+name: Issue Invoice Converter
+description: Generates a PDF invoice from a GitHub issue and sends it via Mailgun
+author: superwalnut
+
+inputs:
+  issue_number:
+    description: GitHub issue number
+    required: true
+  issue_title:
+    description: GitHub issue title
+    required: false
+    default: ''
+  issue_body:
+    description: GitHub issue body
+    required: true
+  github_token:
+    description: GitHub token for posting comments and closing issues
+    required: true
+  github_repository:
+    description: GitHub repository in owner/repo format
+    required: true
+  mailgun_api_key:
+    description: Mailgun API key
+    required: true
+  mailgun_domain:
+    description: Mailgun sending domain
+    required: true
+  company_name:
+    description: Company name shown on invoice
+    required: true
+  company_website:
+    description: Company website
+    required: false
+    default: ''
+  company_abn:
+    description: Company ABN
+    required: false
+    default: ''
+  company_location:
+    description: Company location
+    required: false
+    default: ''
+  company_support_email:
+    description: Support email shown in invoice footer
+    required: false
+    default: ''
+  company_bank_details:
+    description: Bank details shown on invoice (use real newlines or \n as separator)
+    required: false
+    default: ''
+  company_color_primary:
+    description: Primary brand colour (hex) e.g. #22589e
+    required: false
+    default: '#22589e'
+  company_color_dark:
+    description: Darker brand colour (hex) e.g. #1a4a8a
+    required: false
+    default: '#1a4a8a'
+  dry_run:
+    description: If true, generates PDF but skips email and GitHub API calls
+    required: false
+    default: 'false'
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install Chrome dependencies
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y chromium-browser
+
+    - name: Install npm dependencies
+      shell: bash
+      run: npm install
+      working-directory: ${{ github.action_path }}
+
+    - name: Write issue body to file
+      shell: bash
+      run: |
+        cat > /tmp/issue-body.txt << 'ISSUE_EOF'
+        ${{ inputs.issue_body }}
+        ISSUE_EOF
+
+    - name: Run invoice script
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      env:
+        ISSUE_BODY_FILE: /tmp/issue-body.txt
+        ISSUE_NUMBER: ${{ inputs.issue_number }}
+        ISSUE_TITLE: ${{ inputs.issue_title }}
+        GITHUB_REPOSITORY: ${{ inputs.github_repository }}
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        MAILGUN_API_KEY: ${{ inputs.mailgun_api_key }}
+        MAILGUN_DOMAIN: ${{ inputs.mailgun_domain }}
+        COMPANY_NAME: ${{ inputs.company_name }}
+        COMPANY_WEBSITE: ${{ inputs.company_website }}
+        COMPANY_ABN: ${{ inputs.company_abn }}
+        COMPANY_LOCATION: ${{ inputs.company_location }}
+        COMPANY_SUPPORT_EMAIL: ${{ inputs.company_support_email }}
+        COMPANY_BANK_DETAILS: ${{ inputs.company_bank_details }}
+        COMPANY_COLOR_PRIMARY: ${{ inputs.company_color_primary }}
+        COMPANY_COLOR_BG: ${{ inputs.company_color_bg }}
+        COMPANY_COLOR_TEXT: ${{ inputs.company_color_text }}
+        DRY_RUN: ${{ inputs.dry_run }}
+      run: node scripts/send-invoice.js
