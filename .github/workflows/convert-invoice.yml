@@ -35,3 +35,7 @@ jobs:
           COMPANY_LOCATION: ${{ vars.COMPANY_LOCATION }}
           COMPANY_SUPPORT_EMAIL: ${{ vars.COMPANY_SUPPORT_EMAIL }}
           COMPANY_BANK_DETAILS: ${{ vars.COMPANY_BANK_DETAILS }}
+          # configure your company colors in the repository variables to customize the invoice design
+          COMPANY_COLOR_PRIMARY: ${{ vars.COMPANY_COLOR_PRIMARY }}
+          COMPANY_COLOR_BG: ${{ vars.COMPANY_COLOR_BG }}
+          COMPANY_COLOR_TEXT: ${{ vars.COMPANY_COLOR_TEXT }}
