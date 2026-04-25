@@ -21,7 +21,8 @@ function parseIssue(rawBody) {
 
   const invoiceNumber = get('Invoice Number') || issueNumber;
   const client   = get('Client');
-  const email    = get('Email');
+  const emailStr = get('Email');
+  const email    = emailStr ? emailStr.split(',').map(e => e.trim()).filter(Boolean) : [];
   const notes    = get('Notes');
   const payment  = get('Payment Method');
   const gst      = get('GST')?.toLowerCase() === 'true';
@@ -86,13 +87,13 @@ async function sendEmail(data, pdfPath) {
 
   const result = await mg.messages.create(process.env.MAILGUN_DOMAIN, {
     from:    `${process.env.COMPANY_NAME} <noreply@${process.env.MAILGUN_DOMAIN}>`,
-    to:      [data.email],
+    to:      data.email,
     subject: `Invoice #${data.invoiceNumber} — ${data.client}`,
     text,
     attachment: [{ filename: `invoice-${data.invoiceNumber}.pdf`, data: fs.readFileSync(pdfPath) }],
   });
 
-  console.log(`Email sent to ${data.email} — ${result.id}`);
+  console.log(`Email sent to ${data.email.join(', ')} — ${result.id}`);
 }
 
 // ─── Close Issue ──────────────────────────────────────────────────────────────
@@ -102,7 +103,7 @@ async function closeIssue(data) {
   const body = [
     `### ✅ Invoice #${data.invoiceNumber} sent`,
     ``,
-    `Emailed to **${data.email}** after approval.`,
+    `Emailed to **${data.email.join(', ')}** after approval.`,
     ``,
     `| | |`,
     `|---|---|`,
@@ -124,14 +125,14 @@ async function main() {
 
   const data = parseIssue(rawBody);
 
-  if (!data.client) { console.error('Missing: Client'); process.exit(1); }
-  if (!data.email)  { console.error('Missing: Email');  process.exit(1); }
+  if (!data.client)        { console.error('Missing: Client'); process.exit(1); }
+  if (data.email.length === 0) { console.error('Missing: Email');  process.exit(1); }
 
   const pdfPath = await downloadPDF(data);
 
   if (process.env.DRY_RUN === 'true') {
     console.log('DRY RUN — skipping email send');
-    console.log(`Would send invoice #${data.invoiceNumber} to ${data.email}`);
+    console.log(`Would send invoice #${data.invoiceNumber} to ${data.email.join(', ')}`);
     return;
   }
 

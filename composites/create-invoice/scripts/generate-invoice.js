@@ -19,7 +19,8 @@ function parseIssue(rawBody) {
   const get  = (key) => body.match(new RegExp(`\\*\\*${key}:\\*\\*[^\\S\n]*(.+)`))?.[1]?.trim();
 
   const client   = get('Client');
-  const email    = get('Email');
+  const emailStr = get('Email');
+  const email    = emailStr ? emailStr.split(',').map(e => e.trim()).filter(Boolean) : [];
   const phone    = get('Phone');
   const notes    = get('Notes');
   const payment  = get('Payment Method');
@@ -362,7 +363,7 @@ async function postPreviewComment(data, invoiceNumber, repoFilePath) {
     `| | |`,
     `|---|---|`,
     `| **Client** | ${data.client} |`,
-    `| **Email** | ${data.email} |`,
+    `| **Email** | ${data.email.join(', ')} |`,
     `| **Subtotal** | ${fmt(data.items.reduce((s,i)=>s+i.amount,0))} |`,
     data.discount > 0 ? `| **Discount** | -${fmt(data.discount)} |` : null,
     data.gst ? `| **GST (10%)** | ${fmt(data.gstAmount)} |` : null,
@@ -390,7 +391,6 @@ async function main() {
   const data = parseIssue(body);
 
   if (!data.client)          { console.error('Missing: Client'); process.exit(1); }
-  if (!data.email)           { console.error('Missing: Email');  process.exit(1); }
   if (!data.items.length)    { console.error('Missing: Items');  process.exit(1); }
 
   const { invoiceNumber } = data;
