@@ -256,10 +256,10 @@ table.summary{width:260px;border-collapse:collapse;font-size:13px;}
   align-items:center;
   color:#fff;
 }
-.notes{margin-top:28px;padding:14px 16px;background:#f7f7f7;border-left:3px solid ${colorbg};}
+.notes{margin-top:28px;padding:14px 16px;background:#f7f7f7;border-left:3px solid rgba(0,0,0,0.15);}
 .notes-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#999;margin-bottom:4px;}
 .notes-body{font-size:13px;color:#555;line-height:1.5;}
-.footer{margin-top:40px;padding:20px 40px 24px;border-top:3px solid ${colorPrimary};font-size:11px;color:#aaa;}
+.footer{margin-top:40px;padding:20px 40px 24px;border-top:3px solid rgba(0,0,0,0.15);font-size:11px;color:#aaa;}
 </style></head><body>
 <div class="header">
   <div class="header-topbar"><p class="label">Tax Invoice</p><p>ABN ${companyABN}</p></div>
