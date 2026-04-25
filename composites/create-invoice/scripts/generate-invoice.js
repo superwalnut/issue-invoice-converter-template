@@ -80,22 +80,147 @@ function buildInvoiceHTML(data, invoiceNumber) {
 <html lang="en"><head><meta charset="utf-8"><style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:Arial,Helvetica,sans-serif;color:#333;font-size:14px;background:#fff;}
-.header{background:${colorPrimary};}
-.header-topbar{background:${colorbg};padding:10px 40px;display:flex;justify-content:space-between;align-items:center;}
-.header-topbar p{color:${colorText};font-size:11px;letter-spacing:1px;margin:0;}
-.header-topbar .label{text-transform:uppercase;letter-spacing:2px;}
-.header-main{padding:28px 40px 32px;display:flex;justify-content:space-between;align-items:flex-end;}
-.header-company{display:flex;align-items:center;gap:18px;}
-.monogram{width:52px;height:52px;border-radius:10px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:bold;color:#fff;flex-shrink:0;}
-.company-name{font-size:20px;font-weight:bold;color:#fff;margin:0 0 4px;}
-.header-meta{color:rgba(255,255,255,0.7);font-size:12px;margin:0;}
-.invoice-label{text-align:right;}
-.invoice-label .eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,0.5);margin:0 0 6px;}
-.invoice-label .number{font-size:28px;font-weight:bold;color:#fff;letter-spacing:1px;margin:0 0 4px;}
-.invoice-label .date{font-size:12px;color:rgba(255,255,255,0.6);margin:0;}
-.header-subbar{background:${colorbg};padding:12px 40px;display:flex;gap:32px;align-items:center;}
-.subbar-field p:first-child{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${colorText};margin:0 0 2px;}
-.subbar-field p:last-child{font-size:13px;font-weight:bold;color:${colorText};margin:0;}
+.header{
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(135deg,#1f3c88 0%,#3a7bd5 40%,#00c6ff 100%);
+}
+
+/* soft glow circle */
+.header::before{
+  content:'';
+  position:absolute;
+  top:-120px;
+  right:-120px;
+  width:320px;
+  height:320px;
+  background:radial-gradient(circle at center,
+      rgba(255,255,255,0.25) 0%,
+      rgba(255,255,255,0.08) 40%,
+      transparent 70%);
+  border-radius:50%;
+}
+
+/* subtle diagonal light */
+.header::after{
+  content:'';
+  position:absolute;
+  bottom:-140px;
+  left:-140px;
+  width:360px;
+  height:360px;
+  background:radial-gradient(circle at center,
+      rgba(255,255,255,0.15),
+      transparent 70%);
+  border-radius:50%;
+}
+
+.header-topbar{
+  background:rgba(0,0,0,0.15);
+  backdrop-filter:blur(4px);
+  padding:10px 40px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.header-topbar p{
+  color:rgba(255,255,255,0.85);
+  font-size:11px;
+  letter-spacing:1px;
+}
+
+.header-main{
+  padding:30px 40px 36px;
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  position:relative;
+  z-index:2;
+}
+
+.header-company{
+  display:flex;
+  align-items:center;
+  gap:18px;
+}
+
+.monogram{
+  width:56px;
+  height:56px;
+  border-radius:14px;
+  background:rgba(255,255,255,0.18);
+  backdrop-filter:blur(8px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:22px;
+  font-weight:bold;
+  color:#fff;
+  box-shadow:
+    0 8px 20px rgba(0,0,0,0.25),
+    inset 0 1px 0 rgba(255,255,255,0.25);
+}
+
+.company-name{
+  font-size:22px;
+  font-weight:700;
+  color:#fff;
+  letter-spacing:0.3px;
+}
+
+.header-meta{
+  color:rgba(255,255,255,0.75);
+  font-size:12px;
+}
+
+.invoice-label{
+  text-align:right;
+}
+
+.invoice-label .eyebrow{
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:2px;
+  color:rgba(255,255,255,0.6);
+}
+
+.invoice-label .number{
+  font-size:34px;
+  font-weight:800;
+  color:#fff;
+  letter-spacing:1px;
+}
+
+.invoice-label .date{
+  font-size:12px;
+  color:rgba(255,255,255,0.7);
+}
+
+/* subbar */
+.header-subbar{
+  background:rgba(255,255,255,0.15);
+  backdrop-filter:blur(6px);
+  padding:14px 40px;
+  display:flex;
+  gap:40px;
+  align-items:center;
+  position:relative;
+  z-index:2;
+}
+
+.subbar-field p:first-child{
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  color:rgba(255,255,255,0.75);
+}
+
+.subbar-field p:last-child{
+  font-size:14px;
+  font-weight:600;
+  color:#fff;
+}
 .body{padding:32px 40px;}
 .client-name{font-size:15px;font-weight:bold;color:#1a1a2e;margin-bottom:2px;}
 .meta{font-size:12px;color:#414141;margin-top:2px;}

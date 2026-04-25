@@ -38,5 +38,5 @@ ISSUE_BODY_FILE=./test-issue-body.txt
 ## Run
 
 ```
-node ./composites/scripts/send-invoice.js
+node ./composites/create-invoice/srcipts/generate-invoice.js
 ```
