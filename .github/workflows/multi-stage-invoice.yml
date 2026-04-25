@@ -53,7 +53,7 @@ jobs:
 
       - name: Generate PDF & commit to repo
         id: generate
-        uses: ./.github/actions/generate-invoice-pdf
+        uses: ../../composites/create-invoice
         with:
           issue-body:            ${{ github.event.issue.body }}
           issue-number:          ${{ github.event.issue.number }}
@@ -92,7 +92,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Send invoice email
-        uses: ./.github/actions/send-invoice-email
+        uses: ../../composites/send-invoice
         with:
           issue-body:      ${{ github.event.issue.body }}
           issue-number:    ${{ github.event.issue.number }}

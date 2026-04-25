@@ -78,7 +78,7 @@ runs:
     - name: Generate PDF & commit to repo
       id: generate
       shell: bash
-      run: node ${{ github.action_path }}/scripts/generate-pdf.js
+      run: node ${{ github.action_path }}/scripts/generate-invoice.js
       env:
         ISSUE_BODY:            ${{ inputs.issue-body }}
         ISSUE_NUMBER:          ${{ inputs.issue-number }}
