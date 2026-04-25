@@ -283,7 +283,7 @@ function buildInvoiceHTML(data, invoiceNumber) {
       padding: 4px 12px;
       border-radius: 20px;
       background: #fff3cd;
-      color: #856404;
+      color: #da5151;
       font-weight: bold;
       letter-spacing: 0.5px;
     }
