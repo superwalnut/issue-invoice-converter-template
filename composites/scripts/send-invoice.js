@@ -593,7 +593,7 @@ async function main() {
   }
 
   await sendEmail(data, pdfPath, issueNumber);
-  await commentAndClose(data, invoiceNumber);
+  await commentAndClose(data, issueNumber);
 
   console.log('All done.');
 }
