@@ -65,6 +65,58 @@ async function downloadPDF(data) {
   return localPath;
 }
 
+// ─── Generate Summary ─────────────────────────────────────────────────────────
+
+async function generateSummary(data) {
+  const clientSlug = data.client.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const pdfPath = `invoices/${clientSlug}/invoice-${data.invoiceNumber}.pdf`;
+  const pdfUrl = `https://github.com/${process.env.GITHUB_REPOSITORY}/blob/main/${pdfPath}`;
+
+  const fmt = (n) => `$${parseFloat(n).toFixed(2)}`;
+
+  // Build items table
+  let itemsTable = '| Item | Amount |\n|---|---|\n';
+  for (const item of data.items) {
+    itemsTable += `| ${item.description} | ${fmt(item.amount)} |\n`;
+  }
+
+  const summary = [
+    `### 📧 Invoice #${data.invoiceNumber} Email Summary`,
+    ``,
+    `**Email Content:**`,
+    ``,
+    `| Field | Value |`,
+    `|---|---|`,
+    `| **To** | ${data.email.join(', ')} |`,
+    `| **Subject** | Invoice #${data.invoiceNumber} — ${data.client} |`,
+    `| **Client** | ${data.client} |`,
+    `| **Total Due** | **${fmt(data.total)}** |`,
+    `| **Due Date** | ${data.dueDate} |`,
+    data.payment ? `| **Payment Method** | ${data.payment} |` : null,
+    ``,
+    `**Items:**`,
+    ``,
+    itemsTable,
+    data.discount > 0 ? `**Discount:** ${fmt(data.discount)}` : null,
+    data.gst ? `**GST (10%):** ${fmt(data.gstAmount)}` : null,
+    ``,
+    `**Notes:** ${data.notes || 'None'}`,
+    ``,
+    `---`,
+    ``,
+    `**📄 Invoice PDF:** [${pdfPath}](${pdfUrl})`,
+  ].filter(l => l !== null).join('\n');
+
+  if (process.env.GITHUB_STEP_SUMMARY) {
+    const fs = require('fs');
+    fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary + '\n');
+    console.log('Summary written to GITHUB_STEP_SUMMARY');
+  } else {
+    console.log('GITHUB_STEP_SUMMARY not available, printing summary:');
+    console.log(summary);
+  }
+}
+
 // ─── Send Email ───────────────────────────────────────────────────────────────
 
 async function sendEmail(data, pdfPath) {
@@ -129,6 +181,9 @@ async function main() {
   if (data.email.length === 0) { console.error('Missing: Email');  process.exit(1); }
 
   const pdfPath = await downloadPDF(data);
+
+  // Generate summary (works in both dry-run and normal mode)
+  await generateSummary(data);
 
   if (process.env.DRY_RUN === 'true') {
     console.log('DRY RUN — skipping email send');

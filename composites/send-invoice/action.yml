@@ -45,3 +45,4 @@ runs:
         MAILGUN_API_KEY:   ${{ inputs.mailgun-api-key }}
         MAILGUN_DOMAIN:    ${{ inputs.mailgun-domain }}
         COMPANY_NAME:      ${{ inputs.company-name }}
+        GITHUB_STEP_SUMMARY: ${{ github.step_summary }}
