@@ -278,7 +278,7 @@ async function main() {
   }
 
   const repoFilePath = await commitPDFToRepo(pdfPath, data, issueNumber);
-  await postPreviewComment(data, invoiceNumber, repoFilePath);
+  await postPreviewComment(data, issueNumber, repoFilePath);
   console.log('Done — awaiting environment approval.');
 }
 
