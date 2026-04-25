@@ -72,7 +72,7 @@ async function sendEmail(data, pdfPath) {
   const text = [
     `Hi ${data.client},`,
     ``,
-    `Please find attached Invoice #${datta.invoiceNumber}.`,
+    `Please find attached Invoice #${data.invoiceNumber}.`,
     ``,
     `  Total due:  $${data.total.toFixed(2)}`,
     `  Due date:   ${data.dueDate}`,
@@ -131,7 +131,7 @@ async function main() {
 
   if (process.env.DRY_RUN === 'true') {
     console.log('DRY RUN — skipping email send');
-    console.log(`Would send invoice #${issueNumber} to ${data.email}`);
+    console.log(`Would send invoice #${data.invoiceNumber} to ${data.email}`);
     return;
   }
 
