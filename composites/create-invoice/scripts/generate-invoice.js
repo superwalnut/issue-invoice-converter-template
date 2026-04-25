@@ -53,9 +53,9 @@ function parseIssue(rawBody) {
 // ─── Build Invoice HTML ───────────────────────────────────────────────────────
 
 function buildInvoiceHTML(data, invoiceNumber) {
-  const colorPrimary = `#${process.env.COMPANY_COLOR_PRIMARY || '22589e'}`;
-  const colorbg      = `#${process.env.COMPANY_COLOR_BG      || '1a4a8a'}`;
-  const colorText    = `#${process.env.COMPANY_COLOR_TEXT    || '1a1a1d'}`;
+  // const colorPrimary = `#${process.env.COMPANY_COLOR_PRIMARY || '22589e'}`;
+  // const colorbg      = `#${process.env.COMPANY_COLOR_BG      || '1a4a8a'}`;
+  // const colorText    = `#${process.env.COMPANY_COLOR_TEXT    || '1a1a1d'}`;
 
   const companyName         = process.env.COMPANY_NAME          || '';
   const companyWebsite      = process.env.COMPANY_WEBSITE       || '';
@@ -226,7 +226,14 @@ body{font-family:Arial,Helvetica,sans-serif;color:#333;font-size:14px;background
 .meta{font-size:12px;color:#414141;margin-top:2px;}
 .badge-unpaid{display:inline-block;font-size:10px;padding:4px 12px;border-radius:20px;background:#fff3cd;color:#da5151;font-weight:bold;letter-spacing:0.5px;}
 table.items{width:100%;border-collapse:collapse;}
-table.items thead tr{background:${colorPrimary};}
+table.items thead tr{
+  background:rgba(0,0,0,0.15);
+  backdrop-filter:blur(4px);
+  padding:10px 40px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
 table.items thead th{padding:10px 14px;font-size:11px;font-weight:bold;color:rgba(255,255,255,0.8);text-align:left;letter-spacing:0.5px;}
 table.items thead th.th-amount{text-align:right;}
 table.items tbody tr{border-bottom:1px solid #f0f0f0;}
@@ -237,7 +244,18 @@ table.items tbody tr:nth-child(even){background:#fafafa;}
 table.summary{width:260px;border-collapse:collapse;font-size:13px;}
 .summary-row td{padding:9px 14px;border-bottom:1px solid #f0f0f0;color:#555;}
 .td-right{text-align:right;}
-.total-row td{padding:12px 14px;font-size:15px;font-weight:bold;background:${colorPrimary};color:#fff;}
+.total-row td{
+  padding:12px 14px;
+  font-size:15px;
+  font-weight:bold;
+  background:rgba(0,0,0,0.15);
+  backdrop-filter:blur(4px);
+  padding:10px 40px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  color:#fff;
+}
 .notes{margin-top:28px;padding:14px 16px;background:#f7f7f7;border-left:3px solid ${colorbg};}
 .notes-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#999;margin-bottom:4px;}
 .notes-body{font-size:13px;color:#555;line-height:1.5;}

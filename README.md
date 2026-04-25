@@ -3,6 +3,7 @@ Issue-Invoice Converter is a GitHub Action that automatically transforms GitHub 
 
 ## Github Issue Template
 
+```
 **Client:** John Smith
 **Email:** john@example.com
 **Phone:** +61 400 000 000
@@ -14,6 +15,7 @@ Issue-Invoice Converter is a GitHub Action that automatically transforms GitHub 
 **GST:** true
 **Notes:** some notes you want to provide
 **Payment Method:** Bank Transfer
+```
 
 ## Test with your .env
 
