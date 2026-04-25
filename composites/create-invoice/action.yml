@@ -1,0 +1,96 @@
+name: Generate Invoice PDF
+description: Renders an invoice as a PDF from the GitHub issue body, commits it to invoices/{client}/ in the repository, and posts a preview comment on the issue.
+
+inputs:
+  issue-body:
+    description: Raw body of the GitHub issue containing invoice fields
+    required: true
+  issue-number:
+    description: GitHub issue number (used as the invoice number)
+    required: true
+  issue-title:
+    description: GitHub issue title
+    required: false
+    default: ''
+  github-token:
+    description: GitHub token with contents:write and issues:write permissions
+    required: true
+  company-name:
+    description: Company name
+    required: true
+  company-website:
+    description: Company website (e.g. acme.com.au)
+    required: false
+    default: ''
+  company-abn:
+    description: Company ABN
+    required: false
+    default: ''
+  company-location:
+    description: Company location (e.g. Sydney NSW 2000)
+    required: false
+    default: ''
+  company-support-email:
+    description: Support email address shown on the invoice
+    required: false
+    default: ''
+  company-bank-details:
+    description: Bank details shown on the invoice (use \n for line breaks)
+    required: false
+    default: ''
+  company-color-primary:
+    description: Primary brand colour as hex without # (e.g. 22589e)
+    required: false
+    default: '22589e'
+  company-color-bg:
+    description: Background/header colour as hex without # (e.g. 1a4a8a)
+    required: false
+    default: '1a4a8a'
+  company-color-text:
+    description: Text colour on dark backgrounds as hex without # (e.g. 1a1a1d)
+    required: false
+    default: '1a1a1d'
+
+outputs:
+  pdf-path:
+    description: Repo-relative path of the committed PDF (e.g. invoices/acme-corp/invoice-42.pdf)
+    value: ${{ steps.generate.outputs.pdf_path }}
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install Chrome dependencies
+      shell: bash
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -y -qq chromium-browser
+
+    - name: Install npm packages
+      shell: bash
+      run: npm install
+      working-directory: ${{ github.action_path }}
+
+    - name: Generate PDF & commit to repo
+      id: generate
+      shell: bash
+      run: node ${{ github.action_path }}/scripts/generate-pdf.js
+      env:
+        ISSUE_BODY:            ${{ inputs.issue-body }}
+        ISSUE_NUMBER:          ${{ inputs.issue-number }}
+        ISSUE_TITLE:           ${{ inputs.issue-title }}
+        GITHUB_REPOSITORY:     ${{ github.repository }}
+        GITHUB_TOKEN:          ${{ inputs.github-token }}
+        COMPANY_NAME:          ${{ inputs.company-name }}
+        COMPANY_WEBSITE:       ${{ inputs.company-website }}
+        COMPANY_ABN:           ${{ inputs.company-abn }}
+        COMPANY_LOCATION:      ${{ inputs.company-location }}
+        COMPANY_SUPPORT_EMAIL: ${{ inputs.company-support-email }}
+        COMPANY_BANK_DETAILS:  ${{ inputs.company-bank-details }}
+        COMPANY_COLOR_PRIMARY: ${{ inputs.company-color-primary }}
+        COMPANY_COLOR_BG:      ${{ inputs.company-color-bg }}
+        COMPANY_COLOR_TEXT:    ${{ inputs.company-color-text }}

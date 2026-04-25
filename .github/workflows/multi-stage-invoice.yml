@@ -1,0 +1,102 @@
+name: Invoice Workflow
+
+# ─────────────────────────────────────────────────────────────────────────────
+# FLOW
+#
+#   1. generate-pdf   — runs automatically when `invoice` label is applied.
+#                       Renders the PDF, commits it to invoices/{client}/, and
+#                       posts a comment with a direct preview link.
+#
+#   2. send-email     — targets the `invoice-review` environment, which has
+#                       required reviewers configured. GitHub will pause here
+#                       and notify reviewers. Once approved in the Actions UI,
+#                       the email is sent and the issue is closed.
+#
+# SETUP REQUIRED
+#   Go to Settings → Environments → New environment → name it `invoice-review`
+#   Add yourself (or your team) as a Required Reviewer.
+#   That's the entire approval gate — no labels, no polling.
+# ─────────────────────────────────────────────────────────────────────────────
+
+on:
+  issues:
+    types: [opened, labeled]
+
+jobs:
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # JOB 1 · Generate PDF and commit to repository
+  # ───────────────────────────────────────────────────────────────────────────
+  generate-pdf:
+    name: "1 · Generate PDF"
+    runs-on: ubuntu-latest
+
+    if: >
+      (github.event.action == 'opened' &&
+       contains(github.event.issue.labels.*.name, 'invoice'))
+      ||
+      (github.event.action == 'labeled' &&
+       github.event.label.name == 'invoice')
+
+    permissions:
+      contents: write
+      issues: write
+
+    outputs:
+      pdf-path: ${{ steps.generate.outputs.pdf-path }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate PDF & commit to repo
+        id: generate
+        uses: ./.github/actions/generate-invoice-pdf
+        with:
+          issue-body:            ${{ github.event.issue.body }}
+          issue-number:          ${{ github.event.issue.number }}
+          issue-title:           ${{ github.event.issue.title }}
+          github-token:          ${{ secrets.GITHUB_TOKEN }}
+          company-name:          ${{ vars.COMPANY_NAME }}
+          company-website:       ${{ vars.COMPANY_WEBSITE }}
+          company-abn:           ${{ vars.COMPANY_ABN }}
+          company-location:      ${{ vars.COMPANY_LOCATION }}
+          company-support-email: ${{ vars.COMPANY_SUPPORT_EMAIL }}
+          company-bank-details:  ${{ vars.COMPANY_BANK_DETAILS }}
+          company-color-primary: ${{ vars.COMPANY_COLOR_PRIMARY }}
+          company-color-bg:      ${{ vars.COMPANY_COLOR_BG }}
+          company-color-text:    ${{ vars.COMPANY_COLOR_TEXT }}
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # JOB 2 · Send email  (gated by the `invoice-review` environment)
+  #
+  # GitHub will pause this job and send a review notification to everyone
+  # listed as a Required Reviewer on the `invoice-review` environment.
+  # The reviewer opens the Actions run, clicks the PDF preview link in the
+  # issue comment, then clicks Approve & deploy to release this job.
+  # ───────────────────────────────────────────────────────────────────────────
+  send-email:
+    name: "2 · Send Email"
+    needs: generate-pdf
+    runs-on: ubuntu-latest
+    environment: invoice-review   # ← this is the approval gate
+
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Send invoice email
+        uses: ./.github/actions/send-invoice-email
+        with:
+          issue-body:      ${{ github.event.issue.body }}
+          issue-number:    ${{ github.event.issue.number }}
+          github-token:    ${{ secrets.GITHUB_TOKEN }}
+          mailgun-api-key: ${{ secrets.MAILGUN_API_KEY }}
+          mailgun-domain:  ${{ secrets.MAILGUN_DOMAIN }}
+          company-name:    ${{ vars.COMPANY_NAME }}
