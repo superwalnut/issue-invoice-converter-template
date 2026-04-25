@@ -25,6 +25,7 @@ function parseIssue(rawBody) {
   const payment  = get('Payment Method');
   const gst      = get('GST')?.toLowerCase() === 'true';
   const discount = parseFloat(get('Discount') || '0');
+  const invoiceNumber = get('Invoice Number') || issueNumber;
 
   let dueDate = get('Due Date');
   if (!dueDate) {
@@ -47,7 +48,7 @@ function parseIssue(rawBody) {
   const gstAmount = gst ? parseFloat((subtotal * 0.1).toFixed(2)) : 0;
   const total     = parseFloat((subtotal + gstAmount).toFixed(2));
 
-  return { client, email, phone, dueDate, notes, payment, items, discount, gst, gstAmount, subtotal, total };
+  return { client, email, phone, dueDate, notes, payment, items, discount, gst, gstAmount, subtotal, total, invoiceNumber };
 }
 
 // ─── Build Invoice HTML ───────────────────────────────────────────────────────
@@ -392,17 +393,18 @@ async function main() {
   if (!data.email)           { console.error('Missing: Email');  process.exit(1); }
   if (!data.items.length)    { console.error('Missing: Items');  process.exit(1); }
 
-  console.log(`Generating invoice #${issueNumber} for ${data.client}…`);
+  const { invoiceNumber } = data;
+  console.log(`Generating invoice #${invoiceNumber} for ${data.client}…`);
 
-  const pdfPath = `/tmp/invoice-${issueNumber}.pdf`;
-  await generatePDF(buildInvoiceHTML(data, issueNumber), pdfPath);
+  const pdfPath = `/tmp/invoice-${invoiceNumber}.pdf`;
+  await generatePDF(buildInvoiceHTML(data, invoiceNumber), pdfPath);
 
   if (process.env.DRY_RUN === 'true') {
     console.log('DRY RUN — skipping commit and comment');
     return;
   }
 
-  const repoFilePath = await commitPDFToRepo(pdfPath, data, issueNumber);
+  const repoFilePath = await commitPDFToRepo(pdfPath, data, invoiceNumber);
   await postPreviewComment(data, issueNumber, repoFilePath);
   console.log('Done — awaiting environment approval.');
 }

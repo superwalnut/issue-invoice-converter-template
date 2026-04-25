@@ -4,6 +4,7 @@ Issue-Invoice Converter is a GitHub Action that automatically transforms GitHub 
 ## Github Issue Template
 
 ```
+**Invoice Number:** FCL000040
 **Client:** John Smith
 **Email:** john@example.com
 **Phone:** +61 400 000 000

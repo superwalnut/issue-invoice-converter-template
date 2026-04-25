@@ -19,6 +19,7 @@ function parseIssue(rawBody) {
   const body = rawBody.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
   const get  = (key) => body.match(new RegExp(`\\*\\*${key}:\\*\\*[^\\S\n]*(.+)`))?.[1]?.trim();
 
+  const invoiceNumber = get('Invoice Number') || issueNumber;
   const client   = get('Client');
   const email    = get('Email');
   const notes    = get('Notes');
@@ -47,15 +48,15 @@ function parseIssue(rawBody) {
   const gstAmount = gst ? parseFloat((subtotal * 0.1).toFixed(2)) : 0;
   const total     = parseFloat((subtotal + gstAmount).toFixed(2));
 
-  return { client, email, notes, payment, dueDate, items, discount, gst, gstAmount, subtotal, total };
+  return { client, email, notes, payment, dueDate, items, discount, gst, gstAmount, subtotal, total, invoiceNumber };
 }
 
 // ─── Download committed PDF from repo ────────────────────────────────────────
 
 async function downloadPDF(data) {
   const clientSlug   = data.client.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-  const repoFilePath = `invoices/${clientSlug}/invoice-${issueNumber}.pdf`;
-  const localPath    = `/tmp/invoice-${issueNumber}.pdf`;
+  const repoFilePath = `invoices/${clientSlug}/invoice-${data.invoiceNumber}.pdf`;
+  const localPath    = `/tmp/invoice-${data.invoiceNumber}.pdf`;
 
   const { data: file } = await octokit.repos.getContent({ owner, repo, path: repoFilePath });
   fs.writeFileSync(localPath, Buffer.from(file.content, 'base64'));
@@ -71,7 +72,7 @@ async function sendEmail(data, pdfPath) {
   const text = [
     `Hi ${data.client},`,
     ``,
-    `Please find attached Invoice #${issueNumber}.`,
+    `Please find attached Invoice #${datta.invoiceNumber}.`,
     ``,
     `  Total due:  $${data.total.toFixed(2)}`,
     `  Due date:   ${data.dueDate}`,
@@ -86,9 +87,9 @@ async function sendEmail(data, pdfPath) {
   const result = await mg.messages.create(process.env.MAILGUN_DOMAIN, {
     from:    `${process.env.COMPANY_NAME} <noreply@${process.env.MAILGUN_DOMAIN}>`,
     to:      [data.email],
-    subject: `Invoice #${issueNumber} — ${data.client}`,
+    subject: `Invoice #${data.invoiceNumber} — ${data.client}`,
     text,
-    attachment: [{ filename: `invoice-${issueNumber}.pdf`, data: fs.readFileSync(pdfPath) }],
+    attachment: [{ filename: `invoice-${data.invoiceNumber}.pdf`, data: fs.readFileSync(pdfPath) }],
   });
 
   console.log(`Email sent to ${data.email} — ${result.id}`);
@@ -99,7 +100,7 @@ async function sendEmail(data, pdfPath) {
 async function closeIssue(data) {
   const fmt  = (n) => `$${parseFloat(n).toFixed(2)}`;
   const body = [
-    `### ✅ Invoice #${issueNumber} sent`,
+    `### ✅ Invoice #${data.invoiceNumber} sent`,
     ``,
     `Emailed to **${data.email}** after approval.`,
     ``,
