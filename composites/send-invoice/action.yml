@@ -36,7 +36,7 @@ runs:
 
     - name: Send invoice email
       shell: bash
-      run: node ${{ github.action_path }}/send-invoice.js
+      run: node ${{ github.action_path }}/scripts/send-invoice.js
       env:
         ISSUE_BODY:        ${{ inputs.issue-body }}
         ISSUE_NUMBER:      ${{ inputs.issue-number }}
