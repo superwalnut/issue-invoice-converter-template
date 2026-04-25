@@ -53,9 +53,6 @@ function parseIssue(rawBody) {
 // ─── Build Invoice HTML ───────────────────────────────────────────────────────
 
 function buildInvoiceHTML(data, invoiceNumber) {
-  // const colorPrimary = `#${process.env.COMPANY_COLOR_PRIMARY || '22589e'}`;
-  // const colorbg      = `#${process.env.COMPANY_COLOR_BG      || '1a4a8a'}`;
-  // const colorText    = `#${process.env.COMPANY_COLOR_TEXT    || '1a1a1d'}`;
 
   const companyName         = process.env.COMPANY_NAME          || '';
   const companyWebsite      = process.env.COMPANY_WEBSITE       || '';
@@ -256,10 +253,10 @@ table.summary{width:260px;border-collapse:collapse;font-size:13px;}
   align-items:center;
   color:#fff;
 }
-.notes{margin-top:28px;padding:14px 16px;background:#f7f7f7;border-left:3px solid rgba(0,0,0,0.15);}
+.notes{margin-top:28px;padding:14px 16px;background:#f7f7f7;border-left:3px solid linear-gradient(135deg,#1f3c88 0%,#3a7bd5 40%,#00c6ff 100%);}
 .notes-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#999;margin-bottom:4px;}
 .notes-body{font-size:13px;color:#555;line-height:1.5;}
-.footer{margin-top:40px;padding:20px 40px 24px;border-top:3px solid rgba(0,0,0,0.15);font-size:11px;color:#aaa;}
+.footer{margin-top:40px;padding:20px 40px 24px;border-top:3px solid linear-gradient(135deg,#1f3c88 0%,#3a7bd5 40%,#00c6ff 100%);font-size:11px;color:#aaa;}
 </style></head><body>
 <div class="header">
   <div class="header-topbar"><p class="label">Tax Invoice</p><p>ABN ${companyABN}</p></div>
@@ -297,11 +294,11 @@ table.summary{width:260px;border-collapse:collapse;font-size:13px;}
   <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
     <div>
       <p style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#999;margin:0 0 4px;">Questions?</p>
-      <a href="mailto:${companySupportEmail}" style="font-size:12px;color:${colorPrimary};text-decoration:none;font-weight:bold;">${companySupportEmail}</a>
+      <a href="mailto:${companySupportEmail}" style="font-size:12px;color:linear-gradient(135deg,#1f3c88 0%,#3a7bd5 40%,#00c6ff 100%);;text-decoration:none;font-weight:bold;">${companySupportEmail}</a>
     </div>
     <div style="text-align:right;">
       <p style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#999;margin:0 0 4px;">Website</p>
-      <a href="https://${companyWebsite}" style="font-size:12px;color:${colorPrimary};text-decoration:none;font-weight:bold;">${companyWebsite}</a>
+      <a href="https://${companyWebsite}" style="font-size:12px;color:linear-gradient(135deg,#1f3c88 0%,#3a7bd5 40%,#00c6ff 100%);text-decoration:none;font-weight:bold;">${companyWebsite}</a>
     </div>
   </div>
   <div style="border-top:1px solid #eee;padding-top:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
