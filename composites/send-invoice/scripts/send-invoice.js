@@ -23,6 +23,8 @@ function parseIssue(rawBody) {
   const client   = get('Client');
   const emailStr = get('Email');
   const email    = emailStr ? emailStr.split(',').map(e => e.trim()).filter(Boolean) : [];
+  const ccStr    = get('CC');
+  const cc       = ccStr ? ccStr.split(',').map(e => e.trim()).filter(Boolean) : [];
   const notes    = get('Notes');
   const payment  = get('Payment Method');
   const gst      = get('GST')?.toLowerCase() === 'true';
@@ -49,7 +51,7 @@ function parseIssue(rawBody) {
   const gstAmount = gst ? parseFloat((subtotal * 0.1).toFixed(2)) : 0;
   const total     = parseFloat((subtotal + gstAmount).toFixed(2));
 
-  return { client, email, notes, payment, dueDate, items, discount, gst, gstAmount, subtotal, total, invoiceNumber };
+  return { client, email, cc, notes, payment, dueDate, items, discount, gst, gstAmount, subtotal, total, invoiceNumber };
 }
 
 // ─── Download committed PDF from repo ────────────────────────────────────────
@@ -88,6 +90,7 @@ async function generateSummary(data) {
     `| Field | Value |`,
     `|---|---|`,
     `| **To** | ${data.email.join(', ')} |`,
+    data.cc && data.cc.length > 0 ? `| **CC** | ${data.cc.join(', ')} |` : null,
     `| **Subject** | Invoice #${data.invoiceNumber} — ${data.client} |`,
     `| **Client** | ${data.client} |`,
     `| **Total Due** | **${fmt(data.total)}** |`,
@@ -137,15 +140,23 @@ async function sendEmail(data, pdfPath) {
     process.env.COMPANY_NAME,
   ].filter(l => l !== null).join('\n');
 
-  const result = await mg.messages.create(process.env.MAILGUN_DOMAIN, {
+  const mailOptions = {
     from:    `${process.env.COMPANY_NAME} <noreply@${process.env.MAILGUN_DOMAIN}>`,
     to:      data.email,
     subject: `Invoice #${data.invoiceNumber} — ${data.client}`,
     text,
     attachment: [{ filename: `invoice-${data.invoiceNumber}.pdf`, data: fs.readFileSync(pdfPath) }],
-  });
+  };
 
-  console.log(`Email sent to ${data.email.join(', ')} — ${result.id}`);
+  if (data.cc && data.cc.length > 0) {
+    mailOptions.cc = data.cc;
+  }
+
+  const result = await mg.messages.create(process.env.MAILGUN_DOMAIN, mailOptions);
+
+  const recipients = data.email.join(', ');
+  const ccInfo = data.cc && data.cc.length > 0 ? ` (CC: ${data.cc.join(', ')})` : '';
+  console.log(`Email sent to ${recipients}${ccInfo} — ${result.id}`);
 }
 
 // ─── Close Issue ──────────────────────────────────────────────────────────────
@@ -155,7 +166,7 @@ async function closeIssue(data) {
   const body = [
     `### ✅ Invoice #${data.invoiceNumber} sent`,
     ``,
-    `Emailed to **${data.email.join(', ')}** after approval.`,
+    `Emailed to **${data.email.join(', ')}**${data.cc && data.cc.length > 0 ? ` (CC: **${data.cc.join(', ')}**)` : ''} after approval.`,
     ``,
     `| | |`,
     `|---|---|`,
