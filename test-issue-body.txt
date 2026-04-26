@@ -1,4 +1,5 @@
 **Client:** Persona 1
+**Client Company:** Sample Company Pty Ltd
 **Email:** person@sample.com
 **Phone:** +61 400 000 000
 **Items:**

@@ -18,8 +18,9 @@ function parseIssue(rawBody) {
   const body = rawBody.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
   const get  = (key) => body.match(new RegExp(`\\*\\*${key}:\\*\\*[^\\S\n]*(.+)`))?.[1]?.trim();
 
-  const client   = get('Client');
-  const emailStr = get('Email');
+  const client        = get('Client');
+  const clientCompany = get('Client Company');
+  const emailStr      = get('Email');
   const email    = emailStr ? emailStr.split(',').map(e => e.trim()).filter(Boolean) : [];
   const phone    = get('Phone');
   const notes    = get('Notes');
@@ -49,7 +50,7 @@ function parseIssue(rawBody) {
   const gstAmount = gst ? parseFloat((subtotal * 0.1).toFixed(2)) : 0;
   const total     = parseFloat((subtotal + gstAmount).toFixed(2));
 
-  return { client, email, phone, dueDate, notes, payment, items, discount, gst, gstAmount, subtotal, total, invoiceNumber };
+  return { client, clientCompany, email, phone, dueDate, notes, payment, items, discount, gst, gstAmount, subtotal, total, invoiceNumber };
 }
 
 // ─── Build Invoice HTML ───────────────────────────────────────────────────────
@@ -257,7 +258,11 @@ table.summary{width:260px;border-collapse:collapse;font-size:13px;}
     </div>
   </div>
   <div class="header-subbar">
-    <div class="subbar-field"><p>Bill to</p><p>${data.client}</p></div>
+    <div class="subbar-field">
+      <p>Bill to</p>
+      <p>${data.client}</p>
+      ${data.clientCompany ? `<p class="meta">${data.clientCompany}</p>` : ''}
+    </div>
     <div class="subbar-field"><p>Due date</p><p>${data.dueDate}</p></div>
     <div class="subbar-field"><p>Amount due</p><p>${fmt(data.total)}</p></div>
     <div style="margin-left:auto;"><span class="badge-unpaid">UNPAID</span></div>
