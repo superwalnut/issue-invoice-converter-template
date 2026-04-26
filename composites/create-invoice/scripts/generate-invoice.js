@@ -224,6 +224,12 @@ body{font-family:Arial,Helvetica,sans-serif;color:#333;font-size:14px;background
   font-weight:600;
   color:#fff;
 }
+
+.subbar-field .field-value{
+  font-size:14px;
+  font-weight:600;
+  color:#fff;
+}
 .body{padding:32px 40px;}
 .client-name{font-size:15px;font-weight:bold;color:#1a1a2e;margin-bottom:2px;}
 .meta{font-size:12px;color:#414141;margin-top:2px;}
@@ -260,7 +266,7 @@ table.summary{width:260px;border-collapse:collapse;font-size:13px;}
   <div class="header-subbar">
     <div class="subbar-field">
       <p>Bill to</p>
-      <p>${data.client}</p>
+      <p class="field-value">${data.client}</p>
       ${data.clientCompany ? `<p class="meta">${data.clientCompany}</p>` : ''}
     </div>
     <div class="subbar-field"><p>Due date</p><p>${data.dueDate}</p></div>
